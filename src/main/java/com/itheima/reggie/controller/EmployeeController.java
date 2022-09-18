@@ -67,12 +67,12 @@ public class EmployeeController {
 //        DigestUtils.md5DigestAsHex(password.getBytes())
 //        employee.setPassword("123456");
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));//设置初始密码并进行md5加密
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());//创建时间和更新时间
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());//创建时间和更新时间
         HttpSession session = request.getSession();
         Long empId = (Long) session.getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+//        employee.setCreateUser(empId);
+//        employee.setUpdateUser(empId);
 
         employeeService.save(employee);
         return R.success("新增员工成功");
@@ -99,11 +99,22 @@ public class EmployeeController {
     @PutMapping
     public R<String> update(@RequestBody Employee employee,HttpServletRequest request){
 //        log.info(employee.toString());
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));
         log.info(employee.toString());
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
 //        return null;
+    }
+
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id){
+//        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(Employee::getId,id);
+        Employee employee = employeeService.getById(id);
+        if(employee != null){
+            return R.success(employee);
+        }
+        return R.error("未查询到");
     }
 }

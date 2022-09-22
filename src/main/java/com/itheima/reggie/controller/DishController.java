@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,8 @@ public class DishController {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(name != null,Dish::getName,name);
         queryWrapper.orderByDesc(Dish::getUpdateTime);
+        queryWrapper.eq(Dish::getIsDeleted,0);
+
         dishService.page(pageInfo,queryWrapper);
         BeanUtils.copyProperties(pageInfo,pageDtoInfo,"records");
         List<Dish> records = pageInfo.getRecords();
@@ -87,5 +90,32 @@ public class DishController {
     public R<DishDto> get(@PathVariable Long id){
         DishDto dishDto = dishService.getByIdWithFlavor(id);
         return R.success(dishDto);
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto){
+        dishService.updateWithFlavor(dishDto);
+        return R.success("新增菜品成功");
+    }
+
+
+    @PostMapping("/status/{status}")
+    public R<String> changeStatus(@PathVariable int status,@RequestParam List<Long> ids){
+        //解决批量修改的问题
+        ArrayList<Dish> dishes = new ArrayList<>();
+        for (Long id : ids) {
+            Dish dish = new Dish();
+            dish.setId(id);
+            dish.setStatus(status);
+            dishes.add(dish);
+        }
+        dishService.updateBatchById(dishes);
+        return R.success("修改状态成功");
+    }
+
+    @DeleteMapping
+    public R<String> delete(Long ids){
+        dishService.removeByIdWithFlavor(ids);
+        return R.success("delete success");
     }
 }

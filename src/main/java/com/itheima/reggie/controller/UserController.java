@@ -68,6 +68,7 @@ public class UserController {
                 user.setStatus(1);
                 userService.save(user);
             }
+            session.setAttribute("user",user.getId());
             return R.success(user);
         }
         return R.error("登陆失败");
